@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  department    Department? @relation(fields: [departmentId], references: [id])
+  departmentId   Int?
+  reviews   Review[]
+  timetables TimeTable[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+
+model Department {
+  id        Int        @id @default(autoincrement())
+  nameKr      String     
+  nameEn    String
+  code      String         @unique
+  courses   Course[]
+  students  User[]
+  professors Professor[] @relation("DepartmentProfessors")
+}
+
+model Professor {
+  id          Int          @id @default(autoincrement())
+  name        String
+  departments Department[] @relation("DepartmentProfessors")
+  lectures    Lecture[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+}
+
+model Course {
+  id           Int        @id @default(autoincrement())
+  title        String
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId Int
+  lectures     Lecture[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+}
+
+model Lecture {
+  id        Int        @id @default(autoincrement())
+  title     String
+  course    Course     @relation(fields: [courseId], references: [id])
+  courseId  Int
+  semester  Semester   @relation(fields: [semesterId], references: [id])
+  semesterId Int
+  professors Professor[]
+  reviews   Review[]
+  timetables TimeTable[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+}
+
+model Semester {
+  id        Int        @id @default(autoincrement())
+  year      Int
+  term      String
+  lectures  Lecture[]
+  timeTables TimeTable[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  content   String?
+  rating    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  lecture   Lecture  @relation(fields: [lectureId], references: [id])
+  lectureId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+
+model TimeTable {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  semester  Semester  @relation(fields: [semesterId], references: [id])
+  semesterId Int
+  lectures  Lecture[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
