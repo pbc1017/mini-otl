@@ -19,6 +19,7 @@ model User {
   department    Department? @relation(fields: [departmentId], references: [id])
   departmentId   Int?
   reviews   Review[]
+  likedReviews Review[] @relation("UserLikes")
   timetables TimeTable[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,6 +90,7 @@ model Review {
   userId    Int
   lecture   Lecture  @relation(fields: [lectureId], references: [id])
   lectureId Int
+  likedBy   User[]   @relation("UserLikes")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?

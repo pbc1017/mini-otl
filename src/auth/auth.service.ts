@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
+import { LoginDto } from 'src/users/dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +20,9 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    const payload = { username: user.email, sub: user.id };
+  async login(loginDto: LoginDto) {
+    const user = await this.usersService.findOne(loginDto.email);
+    const payload = { username: user.email, id: user.id };
     return {
       access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
@@ -32,6 +34,4 @@ export class AuthService {
       }),
     };
   }
-
-  // Additional methods for refresh token logic would go here
 }
